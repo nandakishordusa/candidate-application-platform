@@ -1,5 +1,6 @@
-import { Box, Chip, FormControl, InputLabel, ListSubheader, MenuItem, OutlinedInput, Select, TextField } from '@mui/material'
+import { Box, Chip, Divider, FormControl, InputLabel, ListSubheader, MenuItem, OutlinedInput, Select, TextField } from '@mui/material'
 import React, { useState } from 'react'
+import "../App.css"
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -39,6 +40,14 @@ const worktypes = [
     'Onsite',
     'Hybrid'
 ]
+const salaries = [
+    '0L',
+    '10L',
+    '20L',
+    '30L',
+    '40L',
+    '50L'
+]
 
 export const Header = () => {
 
@@ -46,6 +55,8 @@ export const Header = () => {
     const [location, setLocation] = useState([]);
     const [experience, setExperience] = useState();
     const [workmode, setWorkmode] = useState();
+    const [basepay, setBasePay] = useState();
+    const [input, setInput] = useState();
 
 
     const handleChange = (event, setState) => {
@@ -58,8 +69,8 @@ export const Header = () => {
         );
     };
     return (
-        <>
-            <FormControl sx={{ m: 1, width: 300 }}>
+        <div>
+            <FormControl sx={{m:1, minWidth : 140}}>
                 <InputLabel id="demo-multiple-chip-label">TechStack</InputLabel>
                 <Select
                     labelId="demo-multiple-chip-label"
@@ -76,6 +87,7 @@ export const Header = () => {
                         </Box>
                     )}
                     MenuProps={MenuProps}
+                    autoWidth
                 >
                     {technologies.map((technology) => (
                         <MenuItem
@@ -87,7 +99,7 @@ export const Header = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, width: 300 }}>
+            <FormControl sx={{m:1, minWidth : 140}}>
                 <InputLabel id="demo-multiple-chip-label">Location</InputLabel>
                 <Select
                     labelId="demo-multiple-chip-label"
@@ -103,6 +115,7 @@ export const Header = () => {
                             ))}
                         </Box>
                     )}
+                    autoWidth
                     MenuProps={MenuProps}
                 >
                     {cities.map((city) => (
@@ -115,9 +128,9 @@ export const Header = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <FormControl sx={{m:1, minWidth : 140}}>
                 <InputLabel htmlFor="grouped-select">Roles</InputLabel>
-                <Select defaultValue="" id="grouped-select" label="Roles">
+                <Select defaultValue="" id="grouped-select" label="Roles" autoWidth>
                     <MenuItem value="">
                         <em>Roles</em>
                     </MenuItem>
@@ -129,7 +142,7 @@ export const Header = () => {
                     <MenuItem value={4}>Option 4</MenuItem>
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 160 }}>
+            <FormControl sx={{m:1, minWidth : 200}}>
                 <InputLabel id="demo-simple-select-label">Min Experience</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
@@ -148,7 +161,7 @@ export const Header = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <FormControl sx={{m:1, minWidth : 120}}>
                 <InputLabel id="demo-simple-select-label">Remote</InputLabel>
                 <Select
                     labelId="demo-simple-select-label"
@@ -167,10 +180,30 @@ export const Header = () => {
                 ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
-                <TextField id="outlined-basic" label="Seach Companies" />
+            <FormControl sx={{m:1, minWidth : 200}}>
+                <InputLabel id="demo-simple-select-label">Min Base Pay</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={basepay}
+                    label="Min Base Pay"
+                    onChange={e => handleChange(e,setBasePay)}
+                >
+                {salaries.map((salary) => (
+                    <MenuItem
+                        key={salary}
+                        value={salary}
+                    >
+                        {salary}
+                    </MenuItem>
+                ))}
+                </Select>
             </FormControl>
 
-        </>
+            <FormControl sx={{m:1, minWidth : 140}}>
+                <TextField onChange = {e => handleChange(e,setInput)} id="outlined-basic" label="Seach Companies" />
+            </FormControl>
+
+        </div>
     )
 }
