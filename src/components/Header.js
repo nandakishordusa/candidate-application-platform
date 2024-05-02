@@ -1,6 +1,7 @@
-import { Box, Chip, Divider, FormControl, InputLabel, ListSubheader, MenuItem, OutlinedInput, Select, TextField } from '@mui/material'
-import React, { useState } from 'react'
-import "../App.css"
+import { Box, Chip, FormControl, InputLabel, ListSubheader, MenuItem, OutlinedInput, Select, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { filter_jobs, search_jobs } from '../features/jobSlice';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -41,13 +42,17 @@ const worktypes = [
     'Hybrid'
 ]
 const salaries = [
-    '0L',
-    '10L',
-    '20L',
-    '30L',
-    '40L',
-    '50L'
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60
 ]
+
+const ENGINEERING = ['Backend','FrontEnd','FullStack','IOS','Flutter','React Native','Android','DevOps']
+const DESIGN = ['Designer','Design Manager','Graphic Designer', 'Product Designer']
 
 export const Header = () => {
 
@@ -57,17 +62,114 @@ export const Header = () => {
     const [workmode, setWorkmode] = useState();
     const [basepay, setBasePay] = useState();
     const [input, setInput] = useState();
+    const [roles, setRoles] = useState([]);
 
+    const dispatch = useDispatch()
+    const [filters,setFilters] = useState({})
 
-    const handleChange = (event, setState) => {
+    useEffect(()=>{
+        dispatch(filter_jobs(filters))
+    },[filters])
+
+    useEffect(() => {
+        if(techstack?.length === 0){
+            delete(filters['techstack'])
+        }
+        else{
+            setFilters({...filters, 'techstack' : techstack})
+        }
+    },[techstack])
+
+    useEffect(() => {
+        if(location?.length === 0){
+            delete(filters['location'])
+        }
+        else{
+            setFilters({...filters, 'location' : location})
+        }
+    },[location])
+
+    useEffect(() => {
+        if(experience?.length === 0){
+            delete(filters['minExp'])
+        }
+        else{
+            setFilters({...filters, 'minExp' : experience})
+        }
+    },[experience])
+
+    useEffect(() => {
+        if(basepay === null){
+            delete(filters['minJdSalary'])
+        }
+        else{
+            setFilters({...filters, 'minJdSalary' : basepay})
+        }
+    },[basepay])
+
+    const handleTechChange = (event) => {
         const {
             target: { value },
         } = event;
-        setState(
+        setTechStack(
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,
         );
+
     };
+
+
+
+    const handleLocChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setLocation(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
+
+    };
+
+    const handleRoleChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setRoles(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+         );
+
+    };
+
+    const handleExpChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setExperience(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+         );
+
+    };
+
+    const handleBasepayChange = (event) => {
+        const {
+            target: { value },
+        } = event;
+        setBasePay(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+         );
+
+    };
+
+    
+
+    const handleInput = (e) => {
+        dispatch(search_jobs(e));
+    }
+
     return (
         <div>
             <FormControl sx={{m:1, minWidth : 140}}>
@@ -77,7 +179,7 @@ export const Header = () => {
                     id="demo-multiple-chip"
                     multiple
                     value={techstack}
-                    onChange={(e) => handleChange(e, setTechStack)}
+                    onChange={(e) => handleTechChange(e)}
                     input={<OutlinedInput id="select-multiple-chip" label="techstack" />}
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -92,7 +194,7 @@ export const Header = () => {
                     {technologies.map((technology) => (
                         <MenuItem
                             key={technology}
-                            value={technology}
+                            value={technology.toLowerCase()}
                         >
                             {technology}
                         </MenuItem>
@@ -106,13 +208,13 @@ export const Header = () => {
                     id="demo-multiple-chip"
                     multiple
                     value={location}
-                    onChange={(e) => handleChange(e, setLocation)}
+                    onChange={(e) => handleLocChange(e)}
                     input={<OutlinedInput id="select-multiple-chip" label="location" />}
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {selected.map((value) => (
                                 <Chip key={value} label={value} />
-                            ))}
+                            ))} 
                         </Box>
                     )}
                     autoWidth
@@ -121,7 +223,7 @@ export const Header = () => {
                     {cities.map((city) => (
                         <MenuItem
                             key={city}
-                            value={city}
+                            value={city.toLowerCase}
                         >
                             {city}
                         </MenuItem>
@@ -130,16 +232,47 @@ export const Header = () => {
             </FormControl>
             <FormControl sx={{m:1, minWidth : 140}}>
                 <InputLabel htmlFor="grouped-select">Roles</InputLabel>
-                <Select defaultValue="" id="grouped-select" label="Roles" autoWidth>
-                    <MenuItem value="">
-                        <em>Roles</em>
-                    </MenuItem>
-                    <ListSubheader>Category 1</ListSubheader>
-                    <MenuItem value={1}>Option 1</MenuItem>
-                    <MenuItem value={2}>Option 2</MenuItem>
-                    <ListSubheader>Category 2</ListSubheader>
-                    <MenuItem value={3}>Option 3</MenuItem>
-                    <MenuItem value={4}>Option 4</MenuItem>
+                <Select 
+                    id="grouped-select" 
+                    label="Roles" 
+                    value={roles}
+                    onChange={(e) => handleRoleChange(e)}
+                    multiple
+                    input={<OutlinedInput id="select-multiple-chip" label="roles" />}
+                    renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            {selected.map((value) => (
+                                <Chip key={value} label={value}/>
+                            ))} 
+                        </Box>
+                    )}
+                    autoWidth
+                    MenuProps={MenuProps}
+                >
+                    <ListSubheader>ENGINEERING</ListSubheader>
+                    {
+                        ENGINEERING.map((role) => (
+                            <MenuItem
+                                key={role}
+                                value={role}
+                            >
+                                {role}
+                            </MenuItem>
+                        ))
+                    }
+                    
+                    <ListSubheader>DESIGN</ListSubheader>
+                    {
+                        DESIGN.map((role) => (
+                            <MenuItem
+                                key={role}
+                                value={role}
+                            >
+                                {role}
+                            </MenuItem>
+                        ))
+                    }
+                    
                 </Select>
             </FormControl>
             <FormControl sx={{m:1, minWidth : 200}}>
@@ -149,7 +282,7 @@ export const Header = () => {
                     id="demo-simple-select"
                     value={experience}
                     label="Experience"
-                    onChange={e => handleChange(e,setExperience)}
+                    onChange={e => handleExpChange(e)}
                 >
                     {years.map((year) => (
                         <MenuItem
@@ -168,14 +301,14 @@ export const Header = () => {
                     id="demo-simple-select"
                     value={workmode}
                     label="Remote"
-                    onChange={e => handleChange(e,setWorkmode)}
+                    onChange={e => handleLocChange(e)}
                 >
                 {worktypes.map((work) => (
                     <MenuItem
                         key={work}
                         value={work}
                     >
-                        {workmode}
+                        {work}
                     </MenuItem>
                 ))}
                 </Select>
@@ -187,21 +320,21 @@ export const Header = () => {
                     id="demo-simple-select"
                     value={basepay}
                     label="Min Base Pay"
-                    onChange={e => handleChange(e,setBasePay)}
+                    onChange={e => handleBasepayChange(e)}
                 >
                 {salaries.map((salary) => (
                     <MenuItem
                         key={salary}
                         value={salary}
                     >
-                        {salary}
+                        {salary}L
                     </MenuItem>
                 ))}
                 </Select>
             </FormControl>
 
             <FormControl sx={{m:1, minWidth : 140}}>
-                <TextField onChange = {e => handleChange(e,setInput)} id="outlined-basic" label="Seach Companies" />
+                <TextField onChange = {e => handleInput(e)} id="outlined-basic" label="Seach Companies" />
             </FormControl>
 
         </div>
